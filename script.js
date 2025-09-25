@@ -2,9 +2,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- CONFIGURACIÓN DE CATEGORÍAS Y MATERIALES ---
     const categorias = {
         "Lección 1": {
-            folder: 'Leccion-1',
+            folder: 'Leccion1',
             files: ['vocabulario.csv', 'vervos.csv'],
-         
             materials: [
                 { name: 'Clase 1', file: 'Lekcja1.pdf' },
                 { name: 'Ejercicios', file: 'Lekcja1_Ejercicios.pdf' },
