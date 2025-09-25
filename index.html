@@ -1,1 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visor de Tarjetas Anki</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="main-container">
+        <h1>Mi Colección de Tarjetas</h1>
 
+        <div class="controls">
+            <label for="collection-selector">Elige un mazo:</label>
+            <select id="collection-selector">
+                <option value="">-- Selecciona una categoría --</option>
+            </select>
+        </div>
+
+        <div id="flashcard-container" class="scene">
+            <div id="card" class="card">
+                <div class="card-face card-front"></div>
+                <div class="card-face card-back"></div>
+            </div>
+        </div>
+
+        <div id="navigation">
+            <button id="prev-btn">Anterior</button>
+            <span id="card-counter">0 / 0</span>
+            <button id="next-btn">Siguiente</button>
+        </div>
+        <p class="instructions">Haz clic en la tarjeta para voltearla</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
