@@ -13,10 +13,9 @@ const categorias = {
         ]
     }
 };
-    // ------------------------------------
-
+   // --- Selectores de Elementos ---
     const selector = document.getElementById('collection-selector');
-    const materialsContainer = document.getElementById('materials-container'); // Nuevo
+    const materialsContainer = document.getElementById('materials-container');
     const cardContainer = document.getElementById('flashcard-container');
     const card = document.getElementById('card');
     const cardFront = document.querySelector('.card-front');
@@ -24,6 +23,11 @@ const categorias = {
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
     const cardCounter = document.getElementById('card-counter');
+    
+    // --- Selectores para el Modal ---
+    const modalOverlay = document.getElementById('modal-overlay');
+    const modalLinks = document.getElementById('modal-links');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
 
     let currentCards = [];
     let currentIndex = 0;
@@ -37,14 +41,14 @@ const categorias = {
         categoryData.files.forEach(fileName => {
             const option = document.createElement('option');
             option.value = `${categoryData.folder}/${fileName}`;
-            option.dataset.category = categoryName; // Guardamos la categoría a la que pertenece
+            option.dataset.category = categoryName;
             option.textContent = fileName.replace('.csv', '').replace(/-/g, ' ');
             optgroup.appendChild(option);
         });
         selector.appendChild(optgroup);
     }
 
-    // Cargar la colección y mostrar materiales
+    // Cargar la colección y mostrar el botón de materiales
     selector.addEventListener('change', async (event) => {
         const selectedOption = event.target.selectedOptions[0];
         const filePath = selectedOption.value;
@@ -53,40 +57,61 @@ const categorias = {
         if (filePath && categoryKey) {
             const fullPath = `colecciones/${filePath}`;
             await loadCollection(fullPath);
-            displayMaterials(categoryKey); // Llamamos a la nueva función
+            setupMaterialsButton(categoryKey); // Esta función creará el botón
         } else {
             resetState();
         }
     });
 
-    // --- NUEVA FUNCIÓN PARA MOSTRAR LOS ENLACES ---
-    function displayMaterials(categoryKey) {
-        materialsContainer.innerHTML = ''; // Limpiamos el contenedor
+    // --- LÓGICA DEL MODAL ---
+    function setupMaterialsButton(categoryKey) {
+        materialsContainer.innerHTML = '';
         const category = categorias[categoryKey];
 
         if (category && category.materials && category.materials.length > 0) {
-            category.materials.forEach(material => {
-                const link = document.createElement('a');
-                // La ruta al archivo es: colecciones/NombreCarpeta/materiales/nombreArchivo.pdf
-                link.href = `colecciones/${category.folder}/materiales/${material.file}`;
-                link.textContent = material.name;
-                link.setAttribute('target', '_blank'); // Abre en una nueva pestaña
-                link.setAttribute('download', material.file); // Sugiere descargar el archivo
-                materialsContainer.appendChild(link);
-            });
+            const button = document.createElement('button');
+            button.textContent = `Ver Materiales de ${categoryKey}`;
+            button.onclick = () => showModal(category);
+            materialsContainer.appendChild(button);
         }
     }
 
+    function showModal(category) {
+        modalLinks.innerHTML = '';
+        category.materials.forEach(material => {
+            const link = document.createElement('a');
+            link.href = `colecciones/${category.folder}/materiales/${material.file}`;
+            link.textContent = material.name;
+            link.setAttribute('target', '_blank');
+            link.setAttribute('download', material.file);
+            modalLinks.appendChild(link);
+        });
+        modalOverlay.classList.remove('hidden');
+    }
+
+    function hideModal() {
+        modalOverlay.classList.add('hidden');
+    }
+
+    modalCloseBtn.addEventListener('click', hideModal);
+    modalOverlay.addEventListener('click', (event) => {
+        if (event.target === modalOverlay) {
+            hideModal();
+        }
+    });
+
+    // --- LÓGICA DE LAS TARJETAS ---
     async function loadCollection(path) {
-        // (Esta función no cambia, es la misma de antes)
         try {
             const response = await fetch(path);
             if (!response.ok) throw new Error('No se pudo cargar el archivo.');
+            
             const text = await response.text();
             currentCards = text.trim().split('\n').filter(line => line).map(line => {
                 const parts = line.split(',');
                 return { front: parts[0], back: parts[1] };
             });
+
             currentIndex = 0;
             displayCard();
         } catch (error) {
@@ -97,7 +122,6 @@ const categorias = {
     }
 
     function displayCard() {
-        // (Función sin cambios)
         if (currentCards.length === 0) {
             resetState();
             return;
@@ -108,11 +132,32 @@ const categorias = {
         cardBack.textContent = currentCard.back;
         updateNavigation();
     }
-    
-    function updateNavigation() { /* (Sin cambios) */ }
-    cardContainer.addEventListener('click', () => { /* (Sin cambios) */ });
-    nextBtn.addEventListener('click', () => { /* (Sin cambios) */ });
-    prevBtn.addEventListener('click', () => { /* (Sin cambios) */ });
+
+    function updateNavigation() {
+        cardCounter.textContent = `${currentIndex + 1} / ${currentCards.length}`;
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex === currentCards.length - 1;
+    }
+
+    cardContainer.addEventListener('click', () => {
+        if (currentCards.length > 0) {
+            card.classList.toggle('is-flipped');
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if (currentIndex < currentCards.length - 1) {
+            currentIndex++;
+            displayCard();
+        }
+    });
+
+    prevBtn.addEventListener('click', () => {
+        if (currentIndex > 0) {
+            currentIndex--;
+            displayCard();
+        }
+    });
 
     function resetState() {
         currentCards = [];
@@ -123,7 +168,8 @@ const categorias = {
         cardCounter.textContent = '0 / 0';
         prevBtn.disabled = true;
         nextBtn.disabled = true;
-        materialsContainer.innerHTML = ''; // Limpiamos también los materiales
+        materialsContainer.innerHTML = '';
+        hideModal();
     }
     
     resetState();
