@@ -208,3 +208,11 @@ body {
     color: white;
     cursor: pointer;
 }
+.app-logo {
+    max-width: 150px; /* Ajusta este valor según el tamaño deseado */
+    height: auto;    /* Mantiene la proporción de la imagen */
+    margin-bottom: 20px; /* Espacio entre el logo y el título h1 */
+    display: block;  /* Para centrarla con margin auto */
+    margin-left: auto;
+    margin-right: auto;
+}
