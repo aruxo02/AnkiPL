@@ -16,9 +16,9 @@
                 <option value="">-- Selecciona una categoría --</option>
             </select>
         </div>
-
+        
         <div id="materials-container"></div>
-
+        
         <div id="flashcard-container" class="scene">
             <div id="card" class="card">
                 <div class="card-face card-front"></div>
@@ -32,6 +32,15 @@
             <button id="next-btn">Siguiente</button>
         </div>
         <p class="instructions">Haz clic en la tarjeta para voltearla</p>
+    </div>
+
+    <div id="modal-overlay" class="hidden">
+        <div id="modal-content">
+            <h2>Materiales de la Lección</h2>
+            <div id="modal-links">
+                </div>
+            <button id="modal-close-btn">Cerrar</button>
+        </div>
     </div>
 
     <script src="script.js"></script>
