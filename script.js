@@ -1,18 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- CONFIGURACIÓN DE CATEGORÍAS Y MATERIALES ---
-    const categorias = {
-        "Lección 1": {
-            folder: 'Leccion1',
-            files: ['vocabulario.csv', 'vervos.csv'],
-            materials: [
-                { name: 'Clase 1', file: 'Lekcja1.pdf' },
-                { name: 'Ejercicios', file: 'Lekcja1_Ejercicios.pdf' },
-                { name: 'Ejercicios Soluciones', file: 'Lekcja1_Ejercicios_Soluciones.pdf' },
-                { name: 'Vocabulario CSV', file: 'vocabulario.csv' },
-                { name: 'Vervos CSV', file: 'vervos.csv' }
-            ]
-        }
-    };
+const categorias = {
+    "Lección 1": {
+        folder: 'Leccion1',
+        // 👇 CORREGIR AQUÍ
+        files: ['vocabulario.csv', 'verbos.csv'], // Cambia 'vervos' por 'verbos'
+        materials: [
+            { name: 'Clase 1', file: 'Lekcja1.pdf' },
+            { name: 'Ejercicios', file: 'Lekcja1_Ejercicios.pdf' },
+            { name: 'Ejercicios Soluciones', file: 'Lekcja1_Ejercicios_Soluciones.pdf' },
+            { name: 'Vocabulario CSV', file: 'vocabulario.csv' },
+            // 👇 Y CORREGIR AQUÍ TAMBIÉN
+            { name: 'Verbos CSV', file: 'verbos.csv' } // Cambia 'Vervos' por 'Verbos'
+        ]
+    }
+};
     // ------------------------------------
 
     const selector = document.getElementById('collection-selector');
