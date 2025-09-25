@@ -1,19 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- CONFIGURACIÓN DE CATEGORÍAS Y MATERIALES ---
-const categorias = {
+    const categorias = {
         "Lección 1": {
             folder: 'Leccion1',
-            files: ['vocabulario.csv', 'vervos.csv'], 
+            files: ['vocabulario.csv', 'verbos.csv'], // Corregido el typo aquí
             materials: [
                 { name: 'Clase 1', file: 'Lekcja1.pdf' },
                 { name: 'Ejercicios', file: 'Lekcja1_Ejercicios.pdf' },
                 { name: 'Ejercicios Soluciones', file: 'Lekcja1_Ejercicios_Soluciones.pdf' },
                 { name: 'Vocabulario CSV', file: 'vocabulario.csv' },
-                { name: 'Verbos CSV', file: 'vervos.csv' } 
+                { name: 'Verbos CSV', file: 'verbos.csv' } // Y aquí
             ]
         }
     };
-   // --- Selectores de Elementos ---
+
+    // --- Selectores de Elementos ---
     const selector = document.getElementById('collection-selector');
     const materialsContainer = document.getElementById('materials-container');
     const cardContainer = document.getElementById('flashcard-container');
@@ -23,7 +24,8 @@ const categorias = {
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
     const cardCounter = document.getElementById('card-counter');
-    
+    const shuffleBtn = document.getElementById('shuffle-btn'); // <-- AÑADIDO
+
     // --- Selectores para el Modal ---
     const modalOverlay = document.getElementById('modal-overlay');
     const modalLinks = document.getElementById('modal-links');
@@ -48,6 +50,16 @@ const categorias = {
         selector.appendChild(optgroup);
     }
 
+    // --- FUNCIÓN PARA MEZCLAR EL MAZO --- // <-- AÑADIDO
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    // --- EVENTOS DE CLIC ---
+
     // Cargar la colección y mostrar el botón de materiales
     selector.addEventListener('change', async (event) => {
         const selectedOption = event.target.selectedOptions[0];
@@ -57,9 +69,38 @@ const categorias = {
         if (filePath && categoryKey) {
             const fullPath = `colecciones/${filePath}`;
             await loadCollection(fullPath);
-            setupMaterialsButton(categoryKey); // Esta función creará el botón
+            setupMaterialsButton(categoryKey);
         } else {
             resetState();
+        }
+    });
+
+    // Evento para el botón de mezclar // <-- AÑADIDO
+    shuffleBtn.addEventListener('click', () => {
+        if (currentCards.length > 0) {
+            shuffleArray(currentCards);
+            currentIndex = 0;
+            displayCard();
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if (currentIndex < currentCards.length - 1) {
+            currentIndex++;
+            displayCard();
+        }
+    });
+
+    prevBtn.addEventListener('click', () => {
+        if (currentIndex > 0) {
+            currentIndex--;
+            displayCard();
+        }
+    });
+
+    cardContainer.addEventListener('click', () => {
+        if (currentCards.length > 0) {
+            card.classList.toggle('is-flipped');
         }
     });
 
@@ -67,7 +108,6 @@ const categorias = {
     function setupMaterialsButton(categoryKey) {
         materialsContainer.innerHTML = '';
         const category = categorias[categoryKey];
-
         if (category && category.materials && category.materials.length > 0) {
             const button = document.createElement('button');
             button.textContent = `Ver Materiales de ${categoryKey}`;
@@ -105,13 +145,11 @@ const categorias = {
         try {
             const response = await fetch(path);
             if (!response.ok) throw new Error('No se pudo cargar el archivo.');
-            
             const text = await response.text();
             currentCards = text.trim().split('\n').filter(line => line).map(line => {
                 const parts = line.split(',');
                 return { front: parts[0], back: parts[1] };
             });
-
             currentIndex = 0;
             displayCard();
         } catch (error) {
@@ -137,27 +175,8 @@ const categorias = {
         cardCounter.textContent = `${currentIndex + 1} / ${currentCards.length}`;
         prevBtn.disabled = currentIndex === 0;
         nextBtn.disabled = currentIndex === currentCards.length - 1;
+        shuffleBtn.disabled = false; // <-- AÑADIDO
     }
-
-    cardContainer.addEventListener('click', () => {
-        if (currentCards.length > 0) {
-            card.classList.toggle('is-flipped');
-        }
-    });
-
-    nextBtn.addEventListener('click', () => {
-        if (currentIndex < currentCards.length - 1) {
-            currentIndex++;
-            displayCard();
-        }
-    });
-
-    prevBtn.addEventListener('click', () => {
-        if (currentIndex > 0) {
-            currentIndex--;
-            displayCard();
-        }
-    });
 
     function resetState() {
         currentCards = [];
@@ -168,6 +187,7 @@ const categorias = {
         cardCounter.textContent = '0 / 0';
         prevBtn.disabled = true;
         nextBtn.disabled = true;
+        shuffleBtn.disabled = true; // <-- AÑADIDO
         materialsContainer.innerHTML = '';
         hideModal();
     }
