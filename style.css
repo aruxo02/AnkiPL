@@ -216,3 +216,17 @@ body {
     margin-left: auto;
     margin-right: auto;
 }
+#navigation button, #shuffle-btn { /* <-- Modifica esta línea */
+    padding: 10px 20px;
+    font-size: 1em;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+#navigation button:disabled, #shuffle-btn:disabled { /* <-- Y esta línea */
+    background-color: #aaa;
+    cursor: not-allowed;
+}
