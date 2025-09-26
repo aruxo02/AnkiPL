@@ -7,14 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
             materials: [
                 { name: 'Clase 1', file: 'Lekcja1.pdf' },
                 { name: 'Ejercicios', file: 'Lekcja1_Ejercicios.pdf' },
-                { name: 'Ejercicios Soluciones', file: 'Lekcja1_3_Historias.pdf' },
-                { name: 'Historias para leer', file: 'Lekcja1_Ejercicios_Soluciones.pdf' },
+                { name: 'Historias para leer', file: 'Lekcja1_3_Historias.pdf' },
+                { name: 'Ejercicios Soluciones', file: 'Lekcja1_Ejercicios_Soluciones.pdf' },
                 { name: 'Vocabulario CSV', file: 'vocabulario.csv' },
-                { name: 'Vervos CSV', file: 'verbos.csv' } ,
+                { name: 'Verbos CSV', file: 'vervos.csv' } ,
                 { name: 'Frases CSV', file: 'frases.csv' } 
             ]
         }
-        // Si en el futuro añades "Lección 2", etc., el repaso seguirá funcionando solo para la Lección 1.
     };
 
     // --- Selectores de Elementos ---
@@ -49,8 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const reviewOptGroup = document.createElement('optgroup');
     reviewOptGroup.label = "--- Repaso General ---";
     const reviewOption = document.createElement('option');
-    reviewOption.value = "lesson1_review"; 
-    reviewOption.textContent = "Repaso Lección 1 (Mezclado)"; 
+    reviewOption.value = "lesson1_review";
+    reviewOption.textContent = "Repaso Lección 1 (Mezclado)";
     reviewOptGroup.appendChild(reviewOption);
     selector.appendChild(reviewOptGroup);
 
@@ -69,12 +68,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // --- LÓGICA DE CARGA DE MAZOS ---
-    async function loadLesson1Review() { // CAMBIADO
+    async function loadLesson1Review() {
         cardFront.textContent = 'Cargando repaso de Lección 1...';
         let allCards = [];
         const fetchPromises = [];
-        const lesson1Data = categorias["Lección 1"]; // Apunta solo a Lección 1
-
+        const lesson1Data = categorias["Lección 1"];
         if (lesson1Data) {
             for (const fileName of lesson1Data.files) {
                 const path = `colecciones/${lesson1Data.folder}/${fileName}`;
@@ -129,8 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedOption = event.target.selectedOptions[0];
         const filePath = selectedOption.value;
         resetState();
-        if (filePath === "lesson1_review") { // CAMBIADO
-            await loadLesson1Review(); // CAMBIADO
+        if (filePath === "lesson1_review") {
+            await loadLesson1Review();
         } else if (filePath) {
             const categoryKey = selectedOption.dataset.category;
             const fullPath = `colecciones/${filePath}`;
@@ -139,14 +137,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-        shuffleBtn.addEventListener('click', () => {
+    shuffleBtn.addEventListener('click', () => {
         if (currentCards.length > 0) {
-            shuffleArray(currentCards); 
+            shuffleArray(currentCards);
             currentCards.forEach(card => {
                 card.isSwapped = Math.random() < 0.5;
             });
-            currentIndex = 0; 
-            displayCard(); 
+            currentIndex = 0;
+            displayCard();
         }
     });
     
@@ -196,22 +194,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-// REEMPLAZA TU FUNCIÓN displayCard() ANTIGUA CON ESTA NUEVA VERSIÓN
-
     function displayCard() {
         card.classList.remove('is-flipped');
         gradingContainer.classList.add('hidden');
         navigationContainer.classList.remove('hidden');
-         setTimeout(() => {
-        const currentCard = currentCards[currentIndex];
-        const frontText = currentCard.isSwapped ? currentCard.back : currentCard.front;
-        const backText = currentCard.isSwapped ? currentCard.front : currentCard.back;
-        cardFront.textContent = frontText;
-        cardBack.textContent = backText;
         
-        updateNavigation();
-    }, 300);
+        setTimeout(() => {
+            const currentCard = currentCards[currentIndex];
+            const frontText = currentCard.isSwapped ? currentCard.back : currentCard.front;
+            const backText = currentCard.isSwapped ? currentCard.front : currentCard.back;
+            cardFront.textContent = frontText;
+            cardBack.textContent = backText;
+            updateNavigation();
+        }, 300);
     }
+
     function updateNavigation() {
         cardCounter.textContent = `${currentIndex + 1} / ${currentCards.length}`;
         prevBtn.disabled = currentIndex === 0;
