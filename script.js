@@ -194,16 +194,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+// REEMPLAZA TU FUNCIÓN displayCard() ANTIGUA CON ESTA NUEVA VERSIÓN
+
     function displayCard() {
         card.classList.remove('is-flipped');
         gradingContainer.classList.add('hidden');
         navigationContainer.classList.remove('hidden');
-        const currentCard = currentCards[currentIndex];
-        cardFront.textContent = currentCard.front;
-        cardBack.textContent = currentCard.back;
-        updateNavigation();
+        setTimeout(() => {
+            const currentCard = currentCards[currentIndex];
+            cardFront.textContent = currentCard.front;
+            cardBack.textContent = currentCard.back;
+            updateNavigation();
+        }, 300); 
     }
-
     function updateNavigation() {
         cardCounter.textContent = `${currentIndex + 1} / ${currentCards.length}`;
         prevBtn.disabled = currentIndex === 0;
