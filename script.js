@@ -3,13 +3,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const categorias = {
         "Lección 1": {
             folder: 'Leccion1',
-            files: ['vocabulario.csv', 'verbos.csv','frases.csv'], 
+            files: ['vocabulario.csv', 'vervos.csv','frases.csv'], 
             materials: [
                 { name: 'Clase 1', file: 'Lekcja1.pdf' },
                 { name: 'Ejercicios', file: 'Lekcja1_Ejercicios.pdf' },
-                { name: 'Ejercicios Soluciones', file: 'Lekcja1_Ejercicios_Soluciones.pdf' },
+                { name: 'Ejercicios Soluciones', file: 'Lekcja1_3_Historias.pdf' },
+                { name: 'Historias para leer', file: 'Lekcja1_Ejercicios_Soluciones.pdf' },
                 { name: 'Vocabulario CSV', file: 'vocabulario.csv' },
-                { name: 'Verbos CSV', file: 'verbos.csv' } ,
+                { name: 'Vervos CSV', file: 'verbos.csv' } ,
                 { name: 'Frases CSV', file: 'frases.csv' } 
             ]
         }
