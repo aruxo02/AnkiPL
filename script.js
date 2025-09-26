@@ -46,12 +46,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let incorrectAnswers = 0;
 
     // --- INICIALIZACIÓN ---
-    // Poblar el selector con la opción de Repaso Lección 1
     const reviewOptGroup = document.createElement('optgroup');
     reviewOptGroup.label = "--- Repaso General ---";
     const reviewOption = document.createElement('option');
-    reviewOption.value = "lesson1_review"; // CAMBIADO
-    reviewOption.textContent = "Repaso Lección 1 (Mezclado)"; // CAMBIADO
+    reviewOption.value = "lesson1_review"; 
+    reviewOption.textContent = "Repaso Lección 1 (Mezclado)"; 
     reviewOptGroup.appendChild(reviewOption);
     selector.appendChild(reviewOptGroup);
 
@@ -140,11 +139,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    shuffleBtn.addEventListener('click', () => {
+        shuffleBtn.addEventListener('click', () => {
         if (currentCards.length > 0) {
-            shuffleArray(currentCards);
-            currentIndex = 0;
-            displayCard();
+            shuffleArray(currentCards); 
+            currentCards.forEach(card => {
+                card.isSwapped = Math.random() < 0.5;
+            });
+            currentIndex = 0; 
+            displayCard(); 
         }
     });
     
