@@ -3,16 +3,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const categorias = {
         "Lección 1": {
             folder: 'Leccion1',
-            files: ['vocabulario.csv', 'vervos.csv','frases.csv'], 
+            files: ['vocabulario.csv', 'verbos.csv','frases.csv'], 
             materials: [
                 { name: 'Clase 1', file: 'Lekcja1.pdf' },
                 { name: 'Ejercicios', file: 'Lekcja1_Ejercicios.pdf' },
                 { name: 'Ejercicios Soluciones', file: 'Lekcja1_Ejercicios_Soluciones.pdf' },
                 { name: 'Vocabulario CSV', file: 'vocabulario.csv' },
-                { name: 'Verbos CSV', file: 'vervos.csv' } ,
+                { name: 'Verbos CSV', file: 'verbos.csv' } ,
                 { name: 'Frases CSV', file: 'frases.csv' } 
             ]
         }
+        // Si en el futuro añades "Lección 2", etc., el repaso seguirá funcionando solo para la Lección 1.
     };
 
     // --- Selectores de Elementos ---
@@ -27,16 +28,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const cardCounter = document.getElementById('card-counter');
     const materialsContainer = document.getElementById('materials-container');
     const navigationContainer = document.getElementById('navigation');
-
-    // --- Nuevos Selectores para el Marcador ---
     const scoreContainer = document.getElementById('score-container');
     const correctScoreSpan = document.getElementById('correct-score');
     const incorrectScoreSpan = document.getElementById('incorrect-score');
     const gradingContainer = document.getElementById('grading-container');
     const correctBtn = document.getElementById('correct-btn');
     const wrongBtn = document.getElementById('wrong-btn');
-
-    // --- Selectores para el Modal ---
     const modalOverlay = document.getElementById('modal-overlay');
     const modalLinks = document.getElementById('modal-links');
     const modalCloseBtn = document.getElementById('modal-close-btn');
@@ -48,14 +45,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let incorrectAnswers = 0;
 
     // --- INICIALIZACIÓN ---
-    // Poblar el selector con categorías y la nueva opción "Todas"
-    const allOptGroup = document.createElement('optgroup');
-    allOptGroup.label = "--- Repaso General ---";
-    const allOption = document.createElement('option');
-    allOption.value = "all";
-    allOption.textContent = "Todas las Tarjetas (Mezcladas)";
-    allOptGroup.appendChild(allOption);
-    selector.appendChild(allOptGroup);
+    // Poblar el selector con la opción de Repaso Lección 1
+    const reviewOptGroup = document.createElement('optgroup');
+    reviewOptGroup.label = "--- Repaso General ---";
+    const reviewOption = document.createElement('option');
+    reviewOption.value = "lesson1_review"; // CAMBIADO
+    reviewOption.textContent = "Repaso Lección 1 (Mezclado)"; // CAMBIADO
+    reviewOptGroup.appendChild(reviewOption);
+    selector.appendChild(reviewOptGroup);
 
     for (const categoryName in categorias) {
         const categoryData = categorias[categoryName];
@@ -72,30 +69,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // --- LÓGICA DE CARGA DE MAZOS ---
-    async function loadAllCollections() {
-        cardFront.textContent = 'Cargando todas las tarjetas...';
+    async function loadLesson1Review() { // CAMBIADO
+        cardFront.textContent = 'Cargando repaso de Lección 1...';
         let allCards = [];
         const fetchPromises = [];
-        for (const categoryName in categorias) {
-            const category = categorias[categoryName];
-            for (const fileName of category.files) {
-                const path = `colecciones/${category.folder}/${fileName}`;
+        const lesson1Data = categorias["Lección 1"]; // Apunta solo a Lección 1
+
+        if (lesson1Data) {
+            for (const fileName of lesson1Data.files) {
+                const path = `colecciones/${lesson1Data.folder}/${fileName}`;
                 fetchPromises.push(
                     fetch(path)
                         .then(response => response.ok ? response.text() : Promise.reject(`Error en ${path}`))
                         .catch(error => { console.error("Fallo al cargar un archivo:", error); return ""; })
                 );
             }
+            const allTexts = await Promise.all(fetchPromises);
+            const combinedText = allTexts.join('\n');
+            allCards = combinedText.trim().split('\n').filter(line => line && line.includes(',')).map(line => {
+                const parts = line.split(',');
+                return { front: parts[0], back: parts[1] };
+            });
+            shuffleArray(allCards);
+            currentCards = allCards;
+            startDeck();
+        } else {
+            cardFront.textContent = 'Error: No se encontró la Lección 1.';
         }
-        const allTexts = await Promise.all(fetchPromises);
-        const combinedText = allTexts.join('\n');
-        allCards = combinedText.trim().split('\n').filter(line => line && line.includes(',')).map(line => {
-            const parts = line.split(',');
-            return { front: parts[0], back: parts[1] };
-        });
-        shuffleArray(allCards);
-        currentCards = allCards;
-        startDeck();
     }
 
     async function loadCollection(path) {
@@ -129,8 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedOption = event.target.selectedOptions[0];
         const filePath = selectedOption.value;
         resetState();
-        if (filePath === "all") {
-            await loadAllCollections();
+        if (filePath === "lesson1_review") { // CAMBIADO
+            await loadLesson1Review(); // CAMBIADO
         } else if (filePath) {
             const categoryKey = selectedOption.dataset.category;
             const fullPath = `colecciones/${filePath}`;
