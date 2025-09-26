@@ -1,46 +1,66 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- CONFIGURACIÓN DE CATEGORÍAS Y MATERIALES ---
+    // --- CONFIGURACIÓN DE CATEGORÍAS ---
     const categorias = {
-        "Lección 1": {
-            folder: 'Leccion1',
-            files: ['vocabulario.csv', 'vervos.csv','frases.csv'], 
-            materials: [
-                { name: 'Clase 1', file: 'Lekcja1.pdf' },
-                { name: 'Ejercicios', file: 'Lekcja1_Ejercicios.pdf' },
-                { name: 'Ejercicios Soluciones', file: 'Lekcja1_Ejercicios_Soluciones.pdf' },
-                { name: 'Vocabulario CSV', file: 'vocabulario.csv' },
-                { name: 'Verbos CSV', file: 'vervos.csv' } ,
-                { name: 'Frases CSV', file: 'frases.csv' } 
-            ]
-        }
-    };
+        "Lección 1": {
+            folder: 'Leccion1',
+            files: ['vocabulario.csv', 'vervos.csv','frases.csv'], 
+            materials: [
+                { name: 'Clase 1', file: 'Lekcja1.pdf' },
+                { name: 'Ejercicios', file: 'Lekcja1_Ejercicios.pdf' },
+                { name: 'Ejercicios Soluciones', file: 'Lekcja1_Ejercicios_Soluciones.pdf' },
+                { name: 'Vocabulario CSV', file: 'vocabulario.csv' },
+                { name: 'Verbos CSV', file: 'vervos.csv' } ,
+                { name: 'Frases CSV', file: 'frases.csv' } 
+            ]
+        }
+    };
 
     // --- Selectores de Elementos ---
     const selector = document.getElementById('collection-selector');
-    const materialsContainer = document.getElementById('materials-container');
     const cardContainer = document.getElementById('flashcard-container');
     const card = document.getElementById('card');
     const cardFront = document.querySelector('.card-front');
     const cardBack = document.querySelector('.card-back');
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
+    const shuffleBtn = document.getElementById('shuffle-btn');
     const cardCounter = document.getElementById('card-counter');
-    const shuffleBtn = document.getElementById('shuffle-btn'); // <-- AÑADIDO
+    const materialsContainer = document.getElementById('materials-container');
+    const navigationContainer = document.getElementById('navigation');
+
+    // --- Nuevos Selectores para el Marcador ---
+    const scoreContainer = document.getElementById('score-container');
+    const correctScoreSpan = document.getElementById('correct-score');
+    const incorrectScoreSpan = document.getElementById('incorrect-score');
+    const gradingContainer = document.getElementById('grading-container');
+    const correctBtn = document.getElementById('correct-btn');
+    const wrongBtn = document.getElementById('wrong-btn');
 
     // --- Selectores para el Modal ---
     const modalOverlay = document.getElementById('modal-overlay');
     const modalLinks = document.getElementById('modal-links');
     const modalCloseBtn = document.getElementById('modal-close-btn');
 
+    // --- Variables de Estado ---
     let currentCards = [];
     let currentIndex = 0;
+    let correctAnswers = 0;
+    let incorrectAnswers = 0;
 
-    // Poblar el selector con categorías y opciones
+    // --- INICIALIZACIÓN ---
+    // Poblar el selector con categorías y la nueva opción "Todas"
+    const allOptGroup = document.createElement('optgroup');
+    allOptGroup.label = "--- Repaso General ---";
+    const allOption = document.createElement('option');
+    allOption.value = "all";
+    allOption.textContent = "Todas las Tarjetas (Mezcladas)";
+    allOptGroup.appendChild(allOption);
+    selector.appendChild(allOptGroup);
+
     for (const categoryName in categorias) {
         const categoryData = categorias[categoryName];
         const optgroup = document.createElement('optgroup');
         optgroup.label = categoryName;
-
         categoryData.files.forEach(fileName => {
             const option = document.createElement('option');
             option.value = `${categoryData.folder}/${fileName}`;
@@ -50,33 +70,75 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         selector.appendChild(optgroup);
     }
+    
+    // --- LÓGICA DE CARGA DE MAZOS ---
+    async function loadAllCollections() {
+        cardFront.textContent = 'Cargando todas las tarjetas...';
+        let allCards = [];
+        const fetchPromises = [];
+        for (const categoryName in categorias) {
+            const category = categorias[categoryName];
+            for (const fileName of category.files) {
+                const path = `colecciones/${category.folder}/${fileName}`;
+                fetchPromises.push(
+                    fetch(path)
+                        .then(response => response.ok ? response.text() : Promise.reject(`Error en ${path}`))
+                        .catch(error => { console.error("Fallo al cargar un archivo:", error); return ""; })
+                );
+            }
+        }
+        const allTexts = await Promise.all(fetchPromises);
+        const combinedText = allTexts.join('\n');
+        allCards = combinedText.trim().split('\n').filter(line => line && line.includes(',')).map(line => {
+            const parts = line.split(',');
+            return { front: parts[0], back: parts[1] };
+        });
+        shuffleArray(allCards);
+        currentCards = allCards;
+        startDeck();
+    }
 
-    // --- FUNCIÓN PARA MEZCLAR EL MAZO --- // <-- AÑADIDO
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
+    async function loadCollection(path) {
+        try {
+            const response = await fetch(path);
+            if (!response.ok) throw new Error('No se pudo cargar el archivo.');
+            const text = await response.text();
+            currentCards = text.trim().split('\n').filter(line => line).map(line => {
+                const parts = line.split(',');
+                return { front: parts[0], back: parts[1] };
+            });
+            startDeck();
+        } catch (error) {
+            console.error('Error cargando la colección:', error);
+            cardFront.textContent = 'Error al cargar el mazo.';
+            cardBack.textContent = '';
         }
     }
 
-    // --- EVENTOS DE CLIC ---
+    function startDeck() {
+        currentIndex = 0;
+        correctAnswers = 0;
+        incorrectAnswers = 0;
+        scoreContainer.classList.remove('hidden');
+        updateScoreDisplay();
+        displayCard();
+    }
 
-    // Cargar la colección y mostrar el botón de materiales
+    // --- EVENTOS DE CLIC ---
     selector.addEventListener('change', async (event) => {
         const selectedOption = event.target.selectedOptions[0];
         const filePath = selectedOption.value;
-        const categoryKey = selectedOption.dataset.category;
-
-        if (filePath && categoryKey) {
+        resetState();
+        if (filePath === "all") {
+            await loadAllCollections();
+        } else if (filePath) {
+            const categoryKey = selectedOption.dataset.category;
             const fullPath = `colecciones/${filePath}`;
             await loadCollection(fullPath);
             setupMaterialsButton(categoryKey);
-        } else {
-            resetState();
         }
     });
 
-    // Evento para el botón de mezclar // <-- AÑADIDO
     shuffleBtn.addEventListener('click', () => {
         if (currentCards.length > 0) {
             shuffleArray(currentCards);
@@ -84,28 +146,100 @@ document.addEventListener('DOMContentLoaded', () => {
             displayCard();
         }
     });
+    
+    cardContainer.addEventListener('click', () => {
+        if (currentCards.length > 0 && cardFront.textContent !== "¡Mazo completado!") {
+            card.classList.toggle('is-flipped');
+            if (card.classList.contains('is-flipped')) {
+                gradingContainer.classList.remove('hidden');
+                navigationContainer.classList.add('hidden');
+            } else {
+                gradingContainer.classList.add('hidden');
+                navigationContainer.classList.remove('hidden');
+            }
+        }
+    });
+
+    correctBtn.addEventListener('click', () => {
+        correctAnswers++;
+        gradeAndProceed();
+    });
+
+    wrongBtn.addEventListener('click', () => {
+        incorrectAnswers++;
+        gradeAndProceed();
+    });
 
     nextBtn.addEventListener('click', () => {
-        if (currentIndex < currentCards.length - 1) {
-            currentIndex++;
-            displayCard();
-        }
+        if (currentIndex < currentCards.length - 1) { currentIndex++; displayCard(); }
     });
 
     prevBtn.addEventListener('click', () => {
-        if (currentIndex > 0) {
-            currentIndex--;
+        if (currentIndex > 0) { currentIndex--; displayCard(); }
+    });
+    
+    // --- FUNCIONES DE ESTADO Y VISUALIZACIÓN ---
+    function gradeAndProceed() {
+        updateScoreDisplay();
+        if (currentIndex < currentCards.length - 1) {
+            currentIndex++;
             displayCard();
+        } else {
+            cardFront.textContent = "¡Mazo completado!";
+            cardBack.textContent = `Resultados: ${correctAnswers} correctas, ${incorrectAnswers} incorrectas.`;
+            card.classList.remove('is-flipped');
+            gradingContainer.classList.add('hidden');
+            navigationContainer.classList.remove('hidden');
         }
-    });
+    }
 
-    cardContainer.addEventListener('click', () => {
-        if (currentCards.length > 0) {
-            card.classList.toggle('is-flipped');
+    function displayCard() {
+        card.classList.remove('is-flipped');
+        gradingContainer.classList.add('hidden');
+        navigationContainer.classList.remove('hidden');
+        const currentCard = currentCards[currentIndex];
+        cardFront.textContent = currentCard.front;
+        cardBack.textContent = currentCard.back;
+        updateNavigation();
+    }
+
+    function updateNavigation() {
+        cardCounter.textContent = `${currentIndex + 1} / ${currentCards.length}`;
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex === currentCards.length - 1;
+        shuffleBtn.disabled = false;
+    }
+
+    function updateScoreDisplay() {
+        correctScoreSpan.textContent = `✅ ${correctAnswers}`;
+        incorrectScoreSpan.textContent = `❌ ${incorrectAnswers}`;
+    }
+
+    function resetState() {
+        currentCards = [];
+        currentIndex = 0;
+        card.classList.remove('is-flipped');
+        cardFront.textContent = 'Selecciona un mazo para empezar';
+        cardBack.textContent = '';
+        cardCounter.textContent = '0 / 0';
+        prevBtn.disabled = true;
+        nextBtn.disabled = true;
+        shuffleBtn.disabled = true;
+        materialsContainer.innerHTML = '';
+        gradingContainer.classList.add('hidden');
+        scoreContainer.classList.add('hidden');
+        navigationContainer.classList.remove('hidden');
+        hideModal();
+    }
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
         }
-    });
+    }
 
-    // --- LÓGICA DEL MODAL ---
+    // --- Lógica del Modal ---
     function setupMaterialsButton(categoryKey) {
         materialsContainer.innerHTML = '';
         const category = categorias[categoryKey];
@@ -131,67 +265,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function hideModal() {
-        modalOverlay.classList.add('hidden');
-    }
-
-    modalCloseBtn.addEventListener('click', hideModal);
-    modalOverlay.addEventListener('click', (event) => {
-        if (event.target === modalOverlay) {
-            hideModal();
-        }
-    });
-
-    // --- LÓGICA DE LAS TARJETAS ---
-    async function loadCollection(path) {
-        try {
-            const response = await fetch(path);
-            if (!response.ok) throw new Error('No se pudo cargar el archivo.');
-            const text = await response.text();
-            currentCards = text.trim().split('\n').filter(line => line).map(line => {
-                const parts = line.split(',');
-                return { front: parts[0], back: parts[1] };
-            });
-            currentIndex = 0;
-            displayCard();
-        } catch (error) {
-            console.error('Error cargando la colección:', error);
-            cardFront.textContent = 'Error al cargar el mazo.';
-            cardBack.textContent = '';
-        }
-    }
-
-    function displayCard() {
-        if (currentCards.length === 0) {
-            resetState();
-            return;
-        }
-        card.classList.remove('is-flipped');
-        const currentCard = currentCards[currentIndex];
-        cardFront.textContent = currentCard.front;
-        cardBack.textContent = currentCard.back;
-        updateNavigation();
-    }
-
-    function updateNavigation() {
-        cardCounter.textContent = `${currentIndex + 1} / ${currentCards.length}`;
-        prevBtn.disabled = currentIndex === 0;
-        nextBtn.disabled = currentIndex === currentCards.length - 1;
-        shuffleBtn.disabled = false; // <-- AÑADIDO
-    }
-
-    function resetState() {
-        currentCards = [];
-        currentIndex = 0;
-        card.classList.remove('is-flipped');
-        cardFront.textContent = 'Selecciona un mazo para empezar';
-        cardBack.textContent = '';
-        cardCounter.textContent = '0 / 0';
-        prevBtn.disabled = true;
-        nextBtn.disabled = true;
-        shuffleBtn.disabled = true; // <-- AÑADIDO
-        materialsContainer.innerHTML = '';
-        hideModal();
+        if (modalOverlay) modalOverlay.classList.add('hidden');
     }
     
-    resetState();
+    modalCloseBtn.addEventListener('click', hideModal);
+    modalOverlay.addEventListener('click', (event) => {
+        if (event.target === modalOverlay) { hideModal(); }
+    });
+    
+    resetState(); // Estado inicial
 });
