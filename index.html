@@ -8,7 +8,8 @@
 </head>
 <body>
     <div class="main-container">
-        <img src="img/icon.png" alt="Logo de la aplicación Anki" class="app-logo">
+        
+        <img src="img/logo.png" alt="Logo de la aplicación Anki" class="app-logo">
         <h1>Mi Colección de Tarjetas</h1>
 
         <div class="controls">
@@ -20,6 +21,10 @@
         
         <div id="materials-container"></div>
         
+        <div id="score-container" class="hidden">
+            <span id="correct-score">✅ 0</span>
+            <span id="incorrect-score">❌ 0</span>
+        </div>
         <div id="flashcard-container" class="scene">
             <div id="card" class="card">
                 <div class="card-face card-front"></div>
@@ -27,6 +32,10 @@
             </div>
         </div>
 
+        <div id="grading-container" class="hidden">
+            <button id="wrong-btn">Incorrecto ❌</button>
+            <button id="correct-btn">Correcto ✅</button>
+        </div>
         <div id="navigation">
             <button id="prev-btn">Anterior</button>
             <button id="shuffle-btn">Mezclar Mazo 🔀</button> 
@@ -39,8 +48,7 @@
     <div id="modal-overlay" class="hidden">
         <div id="modal-content">
             <h2>Materiales de la Lección</h2>
-            <div id="modal-links">
-                </div>
+            <div id="modal-links"></div>
             <button id="modal-close-btn">Cerrar</button>
         </div>
     </div>
