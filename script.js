@@ -202,12 +202,15 @@ document.addEventListener('DOMContentLoaded', () => {
         card.classList.remove('is-flipped');
         gradingContainer.classList.add('hidden');
         navigationContainer.classList.remove('hidden');
-        setTimeout(() => {
-            const currentCard = currentCards[currentIndex];
-            cardFront.textContent = currentCard.front;
-            cardBack.textContent = currentCard.back;
-            updateNavigation();
-        }, 300); 
+         setTimeout(() => {
+        const currentCard = currentCards[currentIndex];
+        const frontText = currentCard.isSwapped ? currentCard.back : currentCard.front;
+        const backText = currentCard.isSwapped ? currentCard.front : currentCard.back;
+        cardFront.textContent = frontText;
+        cardBack.textContent = backText;
+        
+        updateNavigation();
+    }, 300);
     }
     function updateNavigation() {
         cardCounter.textContent = `${currentIndex + 1} / ${currentCards.length}`;
