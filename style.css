@@ -230,3 +230,51 @@ body {
     background-color: #aaa;
     cursor: not-allowed;
 }
+
+.hidden {
+    display: none !important;
+}
+
+#score-container {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #e9ecef;
+    border-radius: 8px;
+}
+
+#score-container span {
+    margin: 0 15px;
+}
+
+#grading-container {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+#grading-container button {
+    padding: 10px 20px;
+    width: 45%;
+    font-size: 1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+#grading-container button:active {
+    transform: scale(0.95);
+}
+
+#wrong-btn {
+    background-color: #dc3545; /* Rojo */
+}
+
+#correct-btn {
+    background-color: #28a745; /* Verde */
+}
