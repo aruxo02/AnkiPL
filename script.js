@@ -16,14 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
         },
             "A1 Lección 2": {
             folder: 'Leccion2',
-            files: ['vocabulario.csv', 'vervos.csv','frases.csv'], 
+            files: ['vocabulario.csv', 'verbos.csv','frases.csv'], 
             materials: [
                 { name: 'Clase 2', file: 'Lekcja2.pdf' },
                 { name: 'Ejercicios', file: 'Lekcja2_Ejercicios.pdf' },
                 { name: 'Historias para leer', file: 'Lekcja2_3_Historias.pdf' },
                 { name: 'Ejercicios Soluciones', file: 'Lekcja2_Ejercicios_Soluciones.pdf' },
                 { name: 'Vocabulario CSV', file: 'vocabulario.csv' },
-                { name: 'Verbos CSV', file: 'vervos.csv' } ,
+                { name: 'Verbos CSV', file: 'verbos.csv' } ,
                 { name: 'Frases CSV', file: 'frases.csv' } 
             ]
         }
