@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- CONFIGURACIÓN DE CATEGORÍAS ---
     const categorias = {
         "A1 Lección 1": {
             folder: 'Leccion1',
@@ -14,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 { name: 'Frases CSV', file: 'frases.csv' } 
             ]
         },
-            "A1 Lección 2": {
+        "A1 Lección 2": {
             folder: 'Leccion2',
             files: ['vocabulario.csv', 'verbos.csv','frases.csv'], 
             materials: [
@@ -60,10 +59,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- INICIALIZACIÓN ---
     const reviewOptGroup = document.createElement('optgroup');
     reviewOptGroup.label = "--- Repaso General ---";
-    const reviewOption = document.createElement('option');
-    reviewOption.value = "lesson1_review";
-    reviewOption.textContent = "Repaso Lección 1 (Mezclado)";
-    reviewOptGroup.appendChild(reviewOption);
+    // Opción para Lección 1
+    const reviewOption1 = document.createElement('option');
+    reviewOption1.value = "lesson1_review";
+    reviewOption1.textContent = "Repaso Lección 1 (Mezclado)";
+    reviewOptGroup.appendChild(reviewOption1);
+
+    // ▼▼▼ AÑADIDO: Opción para Lección 2 ▼▼▼
+    const reviewOption2 = document.createElement('option');
+    reviewOption2.value = "lesson2_review";
+    reviewOption2.textContent = "Repaso Lección 2 (Mezclado)";
+    reviewOptGroup.appendChild(reviewOption2);
+    // ▲▲▲ FIN ▲▲▲
+
     selector.appendChild(reviewOptGroup);
 
     for (const categoryName in categorias) {
@@ -83,30 +91,44 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- LÓGICA DE CARGA DE MAZOS ---
     async function loadLesson1Review() {
         cardFront.textContent = 'Cargando repaso de Lección 1...';
+        // CORREGIDO: Apunta a "A1 Lección 1"
+        const lessonData = categorias["A1 Lección 1"];
+        await loadReviewDeck(lessonData);
+    }
+
+    // ▼▼▼ AÑADIDO: Nueva función para cargar el repaso de la Lección 2 ▼▼▼
+    async function loadLesson2Review() {
+        cardFront.textContent = 'Cargando repaso de Lección 2...';
+        const lessonData = categorias["A1 Lección 2"];
+        await loadReviewDeck(lessonData);
+    }
+    // ▲▲▲ FIN ▲▲▲
+
+    // Función genérica para cargar repasos
+    async function loadReviewDeck(lessonData) {
+        if (!lessonData) {
+            cardFront.textContent = 'Error: No se encontró la lección.';
+            return;
+        }
         let allCards = [];
         const fetchPromises = [];
-        const lesson1Data = categorias["Lección 1"];
-        if (lesson1Data) {
-            for (const fileName of lesson1Data.files) {
-                const path = `colecciones/${lesson1Data.folder}/${fileName}`;
-                fetchPromises.push(
-                    fetch(path)
-                        .then(response => response.ok ? response.text() : Promise.reject(`Error en ${path}`))
-                        .catch(error => { console.error("Fallo al cargar un archivo:", error); return ""; })
-                );
-            }
-            const allTexts = await Promise.all(fetchPromises);
-            const combinedText = allTexts.join('\n');
-            allCards = combinedText.trim().split('\n').filter(line => line && line.includes(',')).map(line => {
-                const parts = line.split(',');
-                return { front: parts[0], back: parts[1] };
-            });
-            shuffleArray(allCards);
-            currentCards = allCards;
-            startDeck();
-        } else {
-            cardFront.textContent = 'Error: No se encontró la Lección 1.';
+        for (const fileName of lessonData.files) {
+            const path = `colecciones/${lessonData.folder}/${fileName}`;
+            fetchPromises.push(
+                fetch(path)
+                    .then(response => response.ok ? response.text() : Promise.reject(`Error en ${path}`))
+                    .catch(error => { console.error("Fallo al cargar un archivo:", error); return ""; })
+            );
         }
+        const allTexts = await Promise.all(fetchPromises);
+        const combinedText = allTexts.join('\n');
+        allCards = combinedText.trim().split('\n').filter(line => line && line.includes(',')).map(line => {
+            const parts = line.split(',');
+            return { front: parts[0], back: parts[1] };
+        });
+        shuffleArray(allCards);
+        currentCards = allCards;
+        startDeck();
     }
 
     async function loadCollection(path) {
@@ -142,6 +164,10 @@ document.addEventListener('DOMContentLoaded', () => {
         resetState();
         if (filePath === "lesson1_review") {
             await loadLesson1Review();
+        // ▼▼▼ AÑADIDO: Condición para el repaso de la Lección 2 ▼▼▼
+        } else if (filePath === "lesson2_review") {
+            await loadLesson2Review();
+        // ▲▲▲ FIN ▲▲▲
         } else if (filePath) {
             const categoryKey = selectedOption.dataset.category;
             const fullPath = `colecciones/${filePath}`;
@@ -161,6 +187,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
+    // ... (El resto del código no cambia) ...
+
     cardContainer.addEventListener('click', () => {
         if (currentCards.length > 0 && cardFront.textContent !== "¡Mazo completado!") {
             card.classList.toggle('is-flipped');
@@ -174,25 +202,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    correctBtn.addEventListener('click', () => {
-        correctAnswers++;
-        gradeAndProceed();
-    });
-
-    wrongBtn.addEventListener('click', () => {
-        incorrectAnswers++;
-        gradeAndProceed();
-    });
-
-    nextBtn.addEventListener('click', () => {
-        if (currentIndex < currentCards.length - 1) { currentIndex++; displayCard(); }
-    });
-
-    prevBtn.addEventListener('click', () => {
-        if (currentIndex > 0) { currentIndex--; displayCard(); }
-    });
+    correctBtn.addEventListener('click', () => { correctAnswers++; gradeAndProceed(); });
+    wrongBtn.addEventListener('click', () => { incorrectAnswers++; gradeAndProceed(); });
+    nextBtn.addEventListener('click', () => { if (currentIndex < currentCards.length - 1) { currentIndex++; displayCard(); } });
+    prevBtn.addEventListener('click', () => { if (currentIndex > 0) { currentIndex--; displayCard(); } });
     
-    // --- FUNCIONES DE ESTADO Y VISUALIZACIÓN ---
     function gradeAndProceed() {
         updateScoreDisplay();
         if (currentIndex < currentCards.length - 1) {
@@ -211,7 +225,6 @@ document.addEventListener('DOMContentLoaded', () => {
         card.classList.remove('is-flipped');
         gradingContainer.classList.add('hidden');
         navigationContainer.classList.remove('hidden');
-        
         setTimeout(() => {
             const currentCard = currentCards[currentIndex];
             const frontText = currentCard.isSwapped ? currentCard.back : currentCard.front;
@@ -258,7 +271,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Lógica del Modal ---
     function setupMaterialsButton(categoryKey) {
         materialsContainer.innerHTML = '';
         const category = categorias[categoryKey];
@@ -288,9 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     modalCloseBtn.addEventListener('click', hideModal);
-    modalOverlay.addEventListener('click', (event) => {
-        if (event.target === modalOverlay) { hideModal(); }
-    });
+    modalOverlay.addEventListener('click', (event) => { if (event.target === modalOverlay) { hideModal(); } });
     
-    resetState(); // Estado inicial
+    resetState();
 });
