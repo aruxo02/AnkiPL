@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
             materials: [
                 { name: 'Clase 1', file: 'Lekcja1.pdf' },
                 { name: 'Ejercicios', file: 'Lekcja1_Ejercicios.pdf' },
-                { name: 'Historias para leer', file: 'Lekcja1_3_Historias.pdf' },
                 { name: 'Ejercicios Soluciones', file: 'Lekcja1_Ejercicios_Soluciones.pdf' },
+                { name: 'Historias para leer', file: 'Lekcja1_3_Historias.pdf' },
                 { name: 'Vocabulario CSV', file: 'vocabulario.csv' },
                 { name: 'Verbos CSV', file: 'vervos.csv' } ,
                 { name: 'Frases CSV', file: 'frases.csv' } 
@@ -15,15 +15,19 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         "A1 Lección 2": {
             folder: 'Leccion2',
-            files: ['vocabulario.csv', 'verbos.csv','frases.csv'], 
+            files: ['vocabulario.csv', 'verbos.csv','frases.csv','adjetivos.csv','mianownik.csv'], 
             materials: [
                 { name: 'Clase 2', file: 'Lekcja2.pdf' },
                 { name: 'Ejercicios', file: 'Lekcja2_Ejercicios.pdf' },
-                { name: 'Historias para leer', file: 'Lekcja2_3_Historias.pdf' },
-                { name: 'Ejercicios Soluciones', file: 'Lekcja2_Ejercicios_Soluciones.pdf' },
+                { name: 'Ejercicios Soluciones', file: 'Lekcja2_Ejercicios_Soluciones.pdf' 
+                { name: 'Ejercicios 2', file: 'Lekcja2_Ejercicios2.pdf' },
+                { name: 'Ejercicios Soluciones 2', file: 'Lekcja2_Ejercicios2_Soluciones.pdf' },
+                { name: 'Historias para leer', file: 'Leckcja2_historia.pdf' },
                 { name: 'Vocabulario CSV', file: 'vocabulario.csv' },
                 { name: 'Verbos CSV', file: 'verbos.csv' } ,
-                { name: 'Frases CSV', file: 'frases.csv' } 
+                { name: 'Frases CSV', file: 'frases.csv' } ,
+                { name: 'Adjetivos CSV', file: 'adjetivos.csv' } ,
+                { name: 'Gramatica Mianownik CSV', file: 'mianownik.csv' } 
             ]
         }
     };
