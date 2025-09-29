@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
             materials: [
                 { name: 'Clase 2', file: 'Lekcja2.pdf' },
                 { name: 'Ejercicios', file: 'Lekcja2_Ejercicios.pdf' },
-                { name: 'Ejercicios Soluciones', file: 'Lekcja2_Ejercicios_Soluciones.pdf' 
+                { name: 'Ejercicios Soluciones', file: 'Lekcja2_Ejercicios_Soluciones.pdf' },
                 { name: 'Ejercicios 2', file: 'Lekcja2_Ejercicios2.pdf' },
                 { name: 'Ejercicios Soluciones 2', file: 'Lekcja2_Ejercicios2_Soluciones.pdf' },
                 { name: 'Historias para leer', file: 'Leckcja2_historia.pdf' },
