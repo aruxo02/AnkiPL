@@ -29,6 +29,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 { name: 'Adjetivos CSV', file: 'adjetivos.csv' } ,
                 { name: 'Gramatica Mianownik CSV', file: 'mianownik.csv' } 
             ]
+        },
+        "A1 Lección 3": {
+            folder: 'Leccion3',
+            files: ['vocabulario.csv', 'verbos.csv','frases.csv','mianownik.csv'], 
+            materials: [
+                { name: 'Clase 3', file: 'Lekcja3.pdf' },
+                { name: 'Ejercicios', file: 'Lekcja3_Ejercicios.pdf' },
+                { name: 'Ejercicios Soluciones', file: 'Lekcja3_Ejercicios_Soluciones.pdf' },
+                { name: 'Historias para leer', file: 'Leckcja3_historia.pdf' },
+                { name: 'Vocabulario CSV', file: 'vocabulario.csv' },
+                { name: 'Verbos CSV', file: 'verbos.csv' } ,
+                { name: 'Frases CSV', file: 'frases.csv' } ,
+                { name: 'Gramatica Narzędnik CSV', file: 'Narzednik.csv' } 
+            ]
         }
     };
 
@@ -76,6 +90,11 @@ document.addEventListener('DOMContentLoaded', () => {
     reviewOptGroup.appendChild(reviewOption2);
     // ▲▲▲ FIN ▲▲▲
 
+    const reviewOption3 = document.createElement('option');
+    reviewOption3.value = "lesson3_review";
+    reviewOption3.textContent = "Repaso Lección 3 (Mezclado)";
+    reviewOptGroup.appendChild(reviewOption3);
+
     selector.appendChild(reviewOptGroup);
 
     for (const categoryName in categorias) {
@@ -107,6 +126,12 @@ document.addEventListener('DOMContentLoaded', () => {
         await loadReviewDeck(lessonData);
     }
     // ▲▲▲ FIN ▲▲▲
+
+    async function loadLesson3Review() {
+        cardFront.textContent = 'Cargando repaso de Lección 3...';
+        const lessonData = categorias["A1 Lección 3"];
+        await loadReviewDeck(lessonData);
+    }
 
     // Función genérica para cargar repasos
     async function loadReviewDeck(lessonData) {
@@ -172,7 +197,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (filePath === "lesson2_review") {
             await loadLesson2Review();
         // ▲▲▲ FIN ▲▲▲
-        } else if (filePath) {
+        }  else if (filePath === "lesson3_review") {
+            await loadLesson3Review();
+        // ▲▲▲ FIN ▲▲▲
+        } 
+        else if (filePath) {
             const categoryKey = selectedOption.dataset.category;
             const fullPath = `colecciones/${filePath}`;
             await loadCollection(fullPath);
