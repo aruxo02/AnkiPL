@@ -43,6 +43,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 { name: 'Frases CSV', file: 'frases.csv' } ,
                 { name: 'Gramatica Narzędnik CSV', file: 'Narzednik.csv' } 
             ]
+        },
+        "Vocabulario Práctico": {
+            folder: 'VocabularioPractico',
+            files: ['A2.1.4Vocabulario.csv'],
+            materials: []
+            }
         }
     };
 
