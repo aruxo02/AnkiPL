@@ -101,6 +101,13 @@ document.addEventListener('DOMContentLoaded', () => {
     reviewOption3.textContent = "Repaso Lección 3 (Mezclado)";
     reviewOptGroup.appendChild(reviewOption3);
 
+    const reviewOptionvp = document.createElement('option');
+    reviewOptionvp.value = "lessonvp_review";
+    reviewOptionvp.textContent = "Repaso Lección vocavularo (Mezclado)";
+    reviewOptGroup.appendChild(reviewOptionvp);
+
+
+
     selector.appendChild(reviewOptGroup);
 
     for (const categoryName in categorias) {
@@ -138,6 +145,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const lessonData = categorias["A1 Lección 3"];
         await loadReviewDeck(lessonData);
     }
+
+        async function loadVocabularioPrReview() {
+        cardFront.textContent = 'Cargando repaso Vocabulario Práctico...';
+        const lessonData = categorias["Vocabulario Práctico"];
+        await loadReviewDeck(lessonData);
+    }
+
 
     // Función genérica para cargar repasos
     async function loadReviewDeck(lessonData) {
@@ -205,6 +219,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // ▲▲▲ FIN ▲▲▲
         }  else if (filePath === "lesson3_review") {
             await loadLesson3Review();
+        // ▲▲▲ FIN ▲▲▲
+        } else if (filePath === "lessonvp_review") {
+            await loadVocabularioPrReview();
         // ▲▲▲ FIN ▲▲▲
         } 
         else if (filePath) {
