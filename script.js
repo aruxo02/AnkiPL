@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         "Vocabulario Práctico": {
             folder: 'VocabularioPractico',
-            files: ['A2.1.4Vocabulario.csv'],
+            files: ['A2.1.4Vocabulario.csv','A2.6.7Vocabulario.csv'],
             materials: []
             }
         
