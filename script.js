@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
             files: ['A2.1.4Vocabulario.csv'],
             materials: []
             }
-        }
+        
     };
 
     // --- Selectores de Elementos ---
